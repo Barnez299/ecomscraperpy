@@ -1,3 +1,5 @@
+import csv
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -37,20 +39,52 @@ def get_detail_data(soup):
     # print(currency)
 
     try:
-        sold = soup.find('span', class_='vi-qtyS-hot-red').find('a').text.strip().split(' ')[0]
+        sold = soup.find('span', class_='vi-qtyS-hot-red').find('a').text.strip().split(' ')[0].replace('\xa0', '')
     except:
         sold = ''
 
     # print(sold)
 
 
+    data = {
+        'title': title,
+        'price': price,
+        'currency': currency,
+        'total sold': sold
+    }
+
+    return data
+
+def get_index_data(soup):
+
+    try:
+        links = soup.find_all('a', class_='s-item__link')
+    except:
+        links = []
+
+    # hrefs only
+
+    urls = [item.get('href') for item in links]
+
+    return urls
+
+
+
+
+
+
+
 def main():
-    url = 'https://www.ebay.com/itm/Mens-Sport-Watches-LED-Date-Waterproof-Digital-Quartz-Military-Wrist-Watch/143669951342?_trkparms=ispr%3D1&hash=item2173657b6e:g:3wAAAOSwvBBZ4X2U&enc=AQAFAAACYBaobrjLl8XobRIiIML1V4Imu%2Fn%2BzU5L90Z278x5ickk7d4nremBkvNKtcC0ZwqXDMlKw2CYo88KT4XRlQBrzRMfLUtiX5irh%2FPpa7tta3CTXQ3zmhIU85g2iGVXRygj3Oh87Ahnu3rjxH%2F9A2jh7Mc65Dy4hJZWuZT2%2Fb4xCyXs1azTE9vD0wKmjz9eqyuC22SUJ064JejjeanyZoIs%2FayR6g81PFdDZmgbkcTN8C1GYgDTjopU10mO%2FVgZIcjDMzkjZfiS%2Fl2suwH1JrxcaYwDcjlxEr5wdQSl7VPkRr3m4%2FQyiKpx0qTlNc1X2L%2BLT4qDAlPlRSlw29oqFFNIMn249vaB9A3B6ZlpPSGWRkaFwaBvvHQrjLstjryBSUjqw5ybGZrTuhyIBXRl3iR6H6kKL%2FQXTh9v7S%2FKcW4qLhSdgAUhoAfrSve%2FDBmap39vghe8GAYRyygHG7yqxigoIRvbWOt0igVAaXb7JDgBIsTxvGyb3E86f9NXQnRnTrkfj69Qe3vWmqxnu8Qno4ggCXiWFERI0CTOjSEMB5rgyryEy%2FgYg870pI9PGLPLYx3035l8YTW9JnF8ZA8D8ANkYjppMzG1hcir2z4IJCV2ETr89F84mbLs9fkcB%2BPFd6SGmBSTmo1hKb30Ii%2BqrIWh24Sp1hEBw7FugA7neJ7A30dfHO8N0Mp7asyysPDvwQFUUsoEijBaJxyNJSc2HusI9VslHwPn0zR0SN3nlJSKdSfUli7E6i6uFyOFFOEPu1wCHRZBA3%2BBZcuEP3LrQ8wkD94CccGpBouHpNI8foYCwJSo&checksum=14366995134259a4ad4a37c9480b91923c15b2a1d6d7'
+    url = 'https://www.ebay.com/sch/i.html?_nkw=mens+watches&_pgn=1'
 
     
 
     
-    get_detail_data(get_page(url))
+    products = get_index_data(get_page(url))
+
+    for link in products:
+        data = get_detail_data(get_page(link))
+        print(data)
 
 
 
